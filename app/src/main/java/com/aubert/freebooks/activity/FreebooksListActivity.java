@@ -29,7 +29,12 @@ public class FreebooksListActivity extends Activity {
     private final String TAG_AVATAR = "avatar";
     private final String TAG_MEDIUMIMAGE = "mediumImage";
 
-    private ArrayList<Book> books;
+    private  final int TAG_IDX_LIST = 0;
+    private  final int TAG_IDX_BOOKS = 1;
+    private  final int TAG_IDX_READER_ONE = 0;
+    private  final int TAG_IDX_READER_TWO = 1;
+
+    private ArrayList<Book> mBooks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +51,16 @@ public class FreebooksListActivity extends Activity {
             public void onResponse(JSONObject response) {
                 Log.d(TAG, response.toString());
 
-                books = new ArrayList<Book>();
+                mBooks = new ArrayList<Book>();
 
                 try {
-                    JSONArray jsonModules = response.getJSONArray(TAG_MODULES);
-                    JSONArray jsonList = (JSONArray)jsonModules.get(0);
-                    JSONObject jsonBook = (JSONObject)jsonList.get(1);
-                    JSONArray jsonBooks = jsonBook.getJSONArray(TAG_BOOKS);
+                    JSONArray arrModules = response.getJSONArray(TAG_MODULES);
+                    JSONArray arrLists = (JSONArray)arrModules.get(TAG_IDX_LIST);
+                    JSONObject objBook = (JSONObject)arrLists.get(TAG_IDX_BOOKS);
+                    JSONArray arrBooks = objBook.getJSONArray(TAG_BOOKS);
 
-                    for (int i = 0; i < jsonBooks.length(); i++) {
-                        JSONObject jsonObj = (JSONObject)jsonBooks.get(i);
+                    for (int i = 0; i < arrBooks.length(); i++) {
+                        JSONObject jsonObj = (JSONObject)arrBooks.get(i);
 
                         Book book = new Book();
                         book.setUrlMediumImage(jsonObj.getString(TAG_MEDIUMIMAGE));
@@ -63,19 +68,19 @@ public class FreebooksListActivity extends Activity {
 
                         JSONArray jsonReaders = jsonObj.getJSONArray(TAG_READERS);
                         if (jsonReaders.length() >= 0){
-                            JSONObject jsonReader = (JSONObject)jsonReaders.get(0);
+                            JSONObject jsonReader = (JSONObject)jsonReaders.get(TAG_IDX_READER_ONE);
                             book.setUrlReaderOneImage(jsonReader.getString(TAG_AVATAR));
                         }
                         if (jsonReaders.length() >= 1){
-                            JSONObject jsonReader = (JSONObject)jsonReaders.get(1);
+                            JSONObject jsonReader = (JSONObject)jsonReaders.get(TAG_IDX_READER_TWO);
                             book.setUrlReaderTwoImage(jsonReader.getString(TAG_AVATAR));
                         }
-                        books.add(book);
+                        mBooks.add(book);
                         Log.d(TAG, jsonObj.getString(TAG_MEDIUMIMAGE));
                     }
 
                     final ListView listView = (ListView)findViewById(R.id.books_list);
-                    listView.setAdapter(new CustomListAdapter(getApplicationContext(), books));
+                    listView.setAdapter(new CustomListAdapter(getApplicationContext(), mBooks));
 
                 } catch (JSONException error) {
                     VolleyLog.e(TAG, error.getMessage());
