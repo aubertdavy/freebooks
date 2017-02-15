@@ -22,18 +22,6 @@ import java.util.ArrayList;
 public class FreebooksListActivity extends Activity {
     public static final String TAG = FreebooksListActivity.class.getSimpleName();
 
-    private final String TAG_TITLE = "title";
-    private final String TAG_BOOKS = "books";
-    private final String TAG_MODULES = "modules";
-    private final String TAG_READERS = "readers";
-    private final String TAG_AVATAR = "avatar";
-    private final String TAG_MEDIUMIMAGE = "mediumImage";
-
-    private  final int TAG_IDX_LIST = 0;
-    private  final int TAG_IDX_BOOKS = 1;
-    private  final int TAG_IDX_READER_ONE = 0;
-    private  final int TAG_IDX_READER_TWO = 1;
-
     private ArrayList<Book> mBooks;
 
     @Override
@@ -54,29 +42,21 @@ public class FreebooksListActivity extends Activity {
                 mBooks = new ArrayList<Book>();
 
                 try {
-                    JSONArray arrModules = response.getJSONArray(TAG_MODULES);
-                    JSONArray arrLists = (JSONArray)arrModules.get(TAG_IDX_LIST);
-                    JSONObject objBook = (JSONObject)arrLists.get(TAG_IDX_BOOKS);
-                    JSONArray arrBooks = objBook.getJSONArray(TAG_BOOKS);
+                    JSONArray arrModules = response.getJSONArray("modules");
+
+                    JSONObject module = (JSONObject)arrModules.get(1);
+
+                    JSONArray arrBooks = module.getJSONArray("books");
 
                     for (int i = 0; i < arrBooks.length(); i++) {
                         JSONObject jsonObj = (JSONObject)arrBooks.get(i);
 
                         Book book = new Book();
-                        book.setUrlMediumImage(jsonObj.getString(TAG_MEDIUMIMAGE));
-                        book.setTitle(jsonObj.getString(TAG_TITLE));
-
-                        JSONArray jsonReaders = jsonObj.getJSONArray(TAG_READERS);
-                        if (jsonReaders.length() >= 0){
-                            JSONObject jsonReader = (JSONObject)jsonReaders.get(TAG_IDX_READER_ONE);
-                            book.setUrlReaderOneImage(jsonReader.getString(TAG_AVATAR));
-                        }
-                        if (jsonReaders.length() >= 1){
-                            JSONObject jsonReader = (JSONObject)jsonReaders.get(TAG_IDX_READER_TWO);
-                            book.setUrlReaderTwoImage(jsonReader.getString(TAG_AVATAR));
-                        }
+                        book.setUrlMediumImage(jsonObj.getString("mediumImage"));
+                        book.setTitle(jsonObj.getString("title"));
                         mBooks.add(book);
-                        Log.d(TAG, jsonObj.getString(TAG_MEDIUMIMAGE));
+
+                        Log.d(TAG, jsonObj.getString("mediumImage"));
                     }
 
                     final ListView listView = (ListView)findViewById(R.id.books_list);

@@ -10,28 +10,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.aubert.freebooks.R;
 import com.aubert.freebooks.entity.Book;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 public class CustomListAdapter extends BaseAdapter {
-//    public static final String TAG = CustomListAdapter.class.getSimpleName();
 
-    private ArrayList listData;
+    private Context mContext;
+    private ArrayList mBooks;
     private LayoutInflater layoutInflater;
 
-    public CustomListAdapter(Context context, ArrayList listData) {
-        this.listData = listData;
+    public CustomListAdapter(Context context, ArrayList books) {
+        mContext = context;
+        mBooks = books;
         layoutInflater = LayoutInflater.from(context);
     }
 
     @Override
     public int getCount() {
-        return listData.size();
+        return mBooks.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return listData.get(position);
+        return mBooks.get(position);
     }
 
     @Override
@@ -40,37 +42,19 @@ public class CustomListAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.activity_freebooks_list_item, null);
-            holder = new ViewHolder();
-            holder.txtTitleView = (TextView)convertView.findViewById(R.id.txtTitle);
-            holder.imageBookView = (ImageView)convertView.findViewById(R.id.imgBook);
-            holder.imageReaderOneView = (ImageView)convertView.findViewById(R.id.imgReaderOne);
-            holder.imageReaderTwoView = (ImageView)convertView.findViewById(R.id.imgReaderTwo);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder)convertView.getTag();
         }
 
-        Book newsBook = (Book)listData.get(position);
-        holder.txtTitleView.setText(newsBook.getTitle());
-        if (holder.imageBookView != null) {
-            new ImageDownloaderTask(holder.imageBookView).execute(newsBook.getUlrMediumImage());
+        Book book = (Book)mBooks.get(position);
+        if (book != null) {
+            ((TextView)convertView.findViewById(R.id.txtTitle)).setText(book.getTitle());
+
+            Picasso.with(mContext)
+                   .load(book.getUlrMediumImage())
+                   .into((ImageView)convertView.findViewById(R.id.imgBook));
         }
-        if (holder.imageReaderOneView != null) {
-            new ImageDownloaderTask(holder.imageReaderOneView).execute(newsBook.getUlrReaderOneImage());
-        }
-        if (holder.imageReaderTwoView != null) {
-            new ImageDownloaderTask(holder.imageReaderTwoView).execute(newsBook.getUlrReaderTwoImage());
-        }
+
         return convertView;
-    }
-
-    static class ViewHolder {
-        TextView txtTitleView;
-        ImageView imageBookView;
-        ImageView imageReaderOneView;
-        ImageView imageReaderTwoView;
     }
 }
